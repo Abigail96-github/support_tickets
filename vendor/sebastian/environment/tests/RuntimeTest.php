@@ -9,135 +9,116 @@
  */
 namespace SebastianBergmann\Environment;
 
+use const PHP_SAPI;
+use const PHP_VERSION;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \SebastianBergmann\Environment\Runtime
- */
+#[CoversClass(Runtime::class)]
 final class RuntimeTest extends TestCase
 {
-    /**
-     * @var \SebastianBergmann\Environment\Runtime
-     */
-    private $env;
-
-    protected function setUp(): void
-    {
-        $this->env = new Runtime;
-    }
-
-    /**
-     * @requires extension xdebug
-     */
+    #[RequiresPhpExtension('xdebug')]
     public function testCanCollectCodeCoverageWhenXdebugExtensionIsEnabled(): void
     {
-        $this->assertTrue($this->env->canCollectCodeCoverage());
+        $this->assertTrue((new Runtime)->canCollectCodeCoverage());
     }
 
-    /**
-     * @requires extension pcov
-     */
+    #[RequiresPhpExtension('pcov')]
     public function testCanCollectCodeCoverageWhenPcovExtensionIsEnabled(): void
     {
-        $this->assertTrue($this->env->canCollectCodeCoverage());
+        $this->assertTrue((new Runtime)->canCollectCodeCoverage());
     }
 
     public function testCanCollectCodeCoverageWhenRunningOnPhpdbg(): void
     {
         $this->markTestSkippedWhenNotRunningOnPhpdbg();
 
-        $this->assertTrue($this->env->canCollectCodeCoverage());
+        $this->assertTrue((new Runtime)->canCollectCodeCoverage());
     }
 
     public function testBinaryCanBeRetrieved(): void
     {
-        $this->assertNotEmpty($this->env->getBinary());
+        $this->assertNotEmpty((new Runtime)->getBinary());
     }
 
-    /**
-     * @requires PHP
-     */
-    public function testIsHhvmReturnsFalseWhenRunningOnPhp(): void
-    {
-        $this->assertFalse($this->env->isHHVM());
-    }
-
-    /**
-     * @requires PHP
-     */
     public function testIsPhpReturnsTrueWhenRunningOnPhp(): void
     {
         $this->markTestSkippedWhenRunningOnPhpdbg();
 
-        $this->assertTrue($this->env->isPHP());
+        $this->assertTrue((new Runtime)->isPHP());
     }
 
-    /**
-     * @requires extension pcov
-     */
+    #[RequiresPhpExtension('pcov')]
     public function testPCOVCanBeDetected(): void
     {
-        $this->assertTrue($this->env->hasPCOV());
+        $this->assertTrue((new Runtime)->hasPCOV());
     }
 
     public function testPhpdbgCanBeDetected(): void
     {
         $this->markTestSkippedWhenNotRunningOnPhpdbg();
 
-        $this->assertTrue($this->env->hasPHPDBGCodeCoverage());
+        $this->assertTrue((new Runtime)->hasPHPDBGCodeCoverage());
     }
 
-    /**
-     * @requires extension xdebug
-     */
+    #[RequiresPhpExtension('xdebug')]
     public function testXdebugCanBeDetected(): void
     {
         $this->markTestSkippedWhenRunningOnPhpdbg();
 
-        $this->assertTrue($this->env->hasXdebug());
+        $this->assertTrue((new Runtime)->hasXdebug());
     }
 
     public function testNameAndVersionCanBeRetrieved(): void
     {
-        $this->assertNotEmpty($this->env->getNameWithVersion());
+        $this->assertNotEmpty((new Runtime)->getNameWithVersion());
     }
 
     public function testGetNameReturnsPhpdbgWhenRunningOnPhpdbg(): void
     {
         $this->markTestSkippedWhenNotRunningOnPhpdbg();
 
-        $this->assertSame('PHPDBG', $this->env->getName());
+        $this->assertSame('PHPDBG', (new Runtime)->getName());
     }
 
-    /**
-     * @requires PHP
-     */
     public function testGetNameReturnsPhpdbgWhenRunningOnPhp(): void
     {
         $this->markTestSkippedWhenRunningOnPhpdbg();
 
-        $this->assertSame('PHP', $this->env->getName());
+        $this->assertSame('PHP', (new Runtime)->getName());
     }
 
     public function testNameAndCodeCoverageDriverCanBeRetrieved(): void
     {
-        $this->assertNotEmpty($this->env->getNameWithVersionAndCodeCoverageDriver());
+        $this->assertNotEmpty((new Runtime)->getNameWithVersionAndCodeCoverageDriver());
     }
 
-    /**
-     * @requires PHP
-     */
     public function testGetVersionReturnsPhpVersionWhenRunningPhp(): void
     {
-        $this->assertSame(\PHP_VERSION, $this->env->getVersion());
+        $this->assertSame(PHP_VERSION, (new Runtime)->getVersion());
     }
 
-    /**
-     * @requires PHP
-     */
     public function testGetVendorUrlReturnsPhpDotNetWhenRunningPhp(): void
     {
-        $this->assertSame('https://secure.php.net/', $this->env->getVendorUrl());
+        $this->assertSame('https://www.php.net/', (new Runtime)->getVendorUrl());
+    }
+
+    public function testGetCurrentSettingsReturnsEmptyDiffIfNoValuesArePassed(): void
+    {
+        $this->assertSame([], (new Runtime)->getCurrentSettings([]));
+    }
+
+    #[RequiresPhpExtension('xdebug')]
+    public function testGetCurrentSettingsReturnsCorrectDiffIfXdebugValuesArePassed(): void
+    {
+        $this->assertIsArray((new Runtime)->getCurrentSettings(['xdebug.mode']));
+        $this->assertArrayHasKey('xdebug.mode', (new Runtime)->getCurrentSettings(['xdebug.mode']));
+    }
+
+    public function testGetCurrentSettingsWillSkipSettingsThatIsNotSet(): void
+    {
+        $this->assertSame([], (new Runtime)->getCurrentSettings(['allow_url_include']));
     }
 
     private function markTestSkippedWhenNotRunningOnPhpdbg(): void
@@ -160,6 +141,6 @@ final class RuntimeTest extends TestCase
 
     private function isRunningOnPhpdbg(): bool
     {
-        return \PHP_SAPI === 'phpdbg';
+        return PHP_SAPI === 'phpdbg';
     }
 }

@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/8.0/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="vendor/autoload.php"
+         cacheDirectory=".phpunit.cache"
          executionOrder="depends,defects"
-         forceCoversAnnotation="true"
-         beStrictAboutCoversAnnotation="true"
+         requireCoverageMetadata="true"
+         beStrictAboutCoverageMetadata="true"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
-         verbose="true">
+         failOnRisky="true"
+         failOnWarning="true"
+         processIsolation="true"
+         colors="true">
     <testsuites>
         <testsuite name="default">
-            <directory suffix="Test.php">tests</directory>
+            <directory>tests/unit</directory>
         </testsuite>
     </testsuites>
 
@@ -19,9 +22,9 @@
         <ini name="date.timezone" value="Etc/UTC"/>
     </php>
 
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
 </phpunit>

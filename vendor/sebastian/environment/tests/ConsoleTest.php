@@ -9,30 +9,20 @@
  */
 namespace SebastianBergmann\Environment;
 
+use const STDOUT;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @covers \SebastianBergmann\Environment\Console
- */
+#[CoversClass(Console::class)]
 final class ConsoleTest extends TestCase
 {
-    /**
-     * @var \SebastianBergmann\Environment\Console
-     */
-    private $console;
-
-    protected function setUp(): void
-    {
-        $this->console = new Console;
-    }
-
     /**
      * @todo Now that this component is PHP 7-only and uses return type declarations
      * this test makes even less sense than before
      */
     public function testCanDetectIfStdoutIsInteractiveByDefault(): void
     {
-        $this->assertIsBool($this->console->isInteractive());
+        $this->assertIsBool((new Console)->isInteractive());
     }
 
     /**
@@ -41,7 +31,7 @@ final class ConsoleTest extends TestCase
      */
     public function testCanDetectIfFileDescriptorIsInteractive(): void
     {
-        $this->assertIsBool($this->console->isInteractive(\STDOUT));
+        $this->assertIsBool((new Console)->isInteractive(STDOUT));
     }
 
     /**
@@ -50,7 +40,7 @@ final class ConsoleTest extends TestCase
      */
     public function testCanDetectColorSupport(): void
     {
-        $this->assertIsBool($this->console->hasColorSupport());
+        $this->assertIsBool((new Console)->hasColorSupport());
     }
 
     /**
@@ -59,6 +49,6 @@ final class ConsoleTest extends TestCase
      */
     public function testCanDetectNumberOfColumns(): void
     {
-        $this->assertIsInt($this->console->getNumberOfColumns());
+        $this->assertIsInt((new Console)->getNumberOfColumns());
     }
 }

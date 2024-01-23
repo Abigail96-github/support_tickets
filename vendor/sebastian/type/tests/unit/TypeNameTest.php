@@ -9,22 +9,24 @@
  */
 namespace SebastianBergmann\Type;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Small;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
-/**
- * @covers \SebastianBergmann\Type\TypeName
- */
+#[CoversClass(TypeName::class)]
+#[Small]
 final class TypeNameTest extends TestCase
 {
     public function testFromReflection(): void
     {
-        $class    = new \ReflectionClass(TypeName::class);
+        $class    = new ReflectionClass(TypeName::class);
         $typeName = TypeName::fromReflection($class);
 
         $this->assertTrue($typeName->isNamespaced());
-        $this->assertEquals('SebastianBergmann\\Type', $typeName->getNamespaceName());
-        $this->assertEquals(TypeName::class, $typeName->getQualifiedName());
-        $this->assertEquals('TypeName', $typeName->getSimpleName());
+        $this->assertSame('SebastianBergmann\\Type', $typeName->namespaceName());
+        $this->assertSame(TypeName::class, $typeName->qualifiedName());
+        $this->assertSame('TypeName', $typeName->simpleName());
     }
 
     public function testFromQualifiedName(): void
@@ -32,9 +34,9 @@ final class TypeNameTest extends TestCase
         $typeName = TypeName::fromQualifiedName('PHPUnit\\Framework\\MockObject\\TypeName');
 
         $this->assertTrue($typeName->isNamespaced());
-        $this->assertEquals('PHPUnit\\Framework\\MockObject', $typeName->getNamespaceName());
-        $this->assertEquals('PHPUnit\\Framework\\MockObject\\TypeName', $typeName->getQualifiedName());
-        $this->assertEquals('TypeName', $typeName->getSimpleName());
+        $this->assertSame('PHPUnit\\Framework\\MockObject', $typeName->namespaceName());
+        $this->assertSame('PHPUnit\\Framework\\MockObject\\TypeName', $typeName->qualifiedName());
+        $this->assertSame('TypeName', $typeName->simpleName());
     }
 
     public function testFromQualifiedNameWithLeadingSeparator(): void
@@ -42,9 +44,9 @@ final class TypeNameTest extends TestCase
         $typeName = TypeName::fromQualifiedName('\\Foo\\Bar');
 
         $this->assertTrue($typeName->isNamespaced());
-        $this->assertEquals('Foo', $typeName->getNamespaceName());
-        $this->assertEquals('Foo\\Bar', $typeName->getQualifiedName());
-        $this->assertEquals('Bar', $typeName->getSimpleName());
+        $this->assertSame('Foo', $typeName->namespaceName());
+        $this->assertSame('Foo\\Bar', $typeName->qualifiedName());
+        $this->assertSame('Bar', $typeName->simpleName());
     }
 
     public function testFromQualifiedNameWithoutNamespace(): void
@@ -52,8 +54,8 @@ final class TypeNameTest extends TestCase
         $typeName = TypeName::fromQualifiedName('Bar');
 
         $this->assertFalse($typeName->isNamespaced());
-        $this->assertNull($typeName->getNamespaceName());
-        $this->assertEquals('Bar', $typeName->getQualifiedName());
-        $this->assertEquals('Bar', $typeName->getSimpleName());
+        $this->assertNull($typeName->namespaceName());
+        $this->assertSame('Bar', $typeName->qualifiedName());
+        $this->assertSame('Bar', $typeName->simpleName());
     }
 }
